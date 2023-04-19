@@ -1,5 +1,5 @@
-%% AMSC 661, Homework 10
-%% Dominic Flocco, April 19, 2023
+% AMSC 661, Homework 10
+% Dominic Flocco, April 19, 2023
 
 function MyIBVP()
 close all
