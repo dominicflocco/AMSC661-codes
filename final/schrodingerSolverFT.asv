@@ -1,0 +1,35 @@
+
+function schrodingerSolverFT
+    % define parameters 
+    k0 = 10; s0 = 0.1;
+    Tmax = 0.4;
+    nPts = 4096; 
+    x = linspace(-20,20,nPts);
+    dx = 40/nPts;
+    dt = 10^(-4);
+    tSteps = floor(Tmax/dt);
+
+    u = zeros(nPts, tSteps);
+    u(:,1) = initial(x,s0,k0)';
+    f0 = fftshift(fft(u(:,1)));
+    k = [-nPts/2 : nPts/2 - 1];
+    
+    for k =1:tSteps
+        ft = f0.*exp()
+    end
+
+end
+
+
+function packet = initial(x,s0,k0)
+    A = (2*pi*s0^2)^(-1/4);
+    packet = A*exp(-x.^2/(4*s0^2) +1j*k0*x);
+end
+
+function sol = exact(x,t,s0,k0)
+    A = (2*pi*s0^2)^(-1/4);
+    aux = 1 + 1j*t/(2*s0^2);
+    num = x.^2 - 4j*s0^2*k0*x +2j*s0^2*k0^2*t; 
+    denom = 4*s0^2*aux;
+    sol = A*exp(-num/denom)/sqrt(aux);
+end

@@ -1,0 +1,55 @@
+
+function schrodingerSolver
+    % define parameters 
+    k0 = 10; s0 = 0.1;
+    Tmax = 0.4;
+    nPts = 4096; 
+    x = linspace(-20,20,nPts);
+    dx = 40/nPts;
+    dt = 10^(-4);
+    tSteps = floor(Tmax/dt);
+    
+    % Define central difference matrix 
+    e = ones(nPts,1);
+    A = spdiags([e -2*e e],-1:1, nPts,nPts);
+    A(nPts,1) = 1; A(1,nPts) = 1;
+    A = (1j/(2*dx^2))*A;
+    u = zeros(nPts, tSteps);
+    u(:,1) = initial(x,s0,k0)';
+    for k = 2:tSteps-1
+        k1 = A*u(:,k); 
+        k2 = A*(u(:,k)+ 0.5*dt*k1)/;
+        k3 = rhs(u(:,k) + 0.5*dt*k2,dx); 
+        k4 = rhs(u(:,k) + dt*k3,dx); 
+        u(:,k+1) = u(:,k) + (dt/6)*(k1+2*k2+2*k3+k4);
+    end
+    
+    figure; hold on;
+    ex = exact(x,0,s0,k0);
+    plot(x, ex);
+    for i = 1:5
+        t = Tmax*(i/5);
+        n = floor(t/dt);
+        ex = exact(x,t,s0,k0);
+        plot(x, abs(u(:,n)));
+    end
+    hold off;
+
+end
+
+function packet = initial(x,s0,k0)
+    A = (2*pi*s0^2)^(-1/4);
+    packet = A*exp(-x.^2/(4*s0^2) +1j*k0*x);
+end
+function f = rhs(u,dx)
+    ujp1 = circshift(u,[0, -1]);
+    ujm1 = circshift(u,[0, 1]);
+    f = (0.5*1j/dx^2)*(ujp1+ujm1 - 2*u);
+end
+function sol = exact(x,t,s0,k0)
+    A = (2*pi*s0^2)^(-1/4);
+    aux = 1 + 1j*t/(2*s0^2);
+    num = x.^2 - 4j*s0^2*k0*x +2j*s0^2*k0^2*t; 
+    denom = 4*s0^2*aux;
+    sol = A/sqrt(aux)*exp(-num/denom);
+end
